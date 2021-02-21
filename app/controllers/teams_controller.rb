@@ -29,6 +29,21 @@ class TeamsController < ApplicationController
     end
   end
 
+  def owner_change
+    # binding.irb
+    if current_user.id == @working_team.owner_id
+
+      assign = Assign.find(params[:id])
+      @team = assign.team
+      @user = assign.user
+      @team.owner = @user
+      @team.update(owner_params)
+      AssignMailer.change_owner(@user).deliver
+      redirect_to @team, notice: "team leaderが#{@user.email}に変更されました"
+    end
+
+  end
+
   def update
     if @team.update(team_params)
       redirect_to @team, notice: I18n.t('views.messages.update_team')
@@ -51,6 +66,10 @@ class TeamsController < ApplicationController
 
   def set_team
     @team = Team.friendly.find(params[:id])
+  end
+
+  def owner_params
+    params.permit(:owner_id)
   end
 
   def team_params
