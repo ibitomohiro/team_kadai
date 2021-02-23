@@ -1,6 +1,10 @@
 class TeamsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_team, only: %i[show edit update destroy]
+  before_action :authorized_member, only: [:edit]
+  # before_action :not_authorized_member
+
+
 
   def index
     @teams = Team.all
@@ -15,7 +19,8 @@ class TeamsController < ApplicationController
     @team = Team.new
   end
 
-  def edit; end
+  def edit
+  end
 
   def create
     @team = Team.new(team_params)
@@ -74,5 +79,13 @@ class TeamsController < ApplicationController
 
   def team_params
     params.fetch(:team, {}).permit %i[name icon icon_cache owner_id keep_team_id]
+  end
+
+  def authorized_member
+    if current_user.id != @team.owner_id
+      redirect_to @team, notice: 'オーナーのみアクセスできます'
+    else
+      render :'teams/edit'
+    end
   end
 end

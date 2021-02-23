@@ -14,7 +14,7 @@
       </div>
       <!-- /.card-header -->
       <div class="card-body">
-        <%= markdown(@article.content).html_safe %>
+        <%= sanitize markdown(@article.content).html_safe %>
         <%= image_tag @article.image_url if @article.image_url %>
       </div>
 
